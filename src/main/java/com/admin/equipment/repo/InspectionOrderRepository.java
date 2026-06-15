@@ -25,9 +25,9 @@ public interface InspectionOrderRepository extends JpaRepository<InspectionOrder
     @Query("SELECT COUNT(o) FROM InspectionOrder o WHERE o.status = 'submitted' AND o.createdAt BETWEEN :start AND :end")
     long countSubmittedOrders(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
-    @Query("SELECT COUNT(o) FROM InspectionOrder o WHERE o.equipmentId = :equipmentId AND o.status = 'submitted'")
+    @Query("SELECT COUNT(o) FROM InspectionOrder o WHERE o.equipmentId = :equipmentId")
     long countByEquipmentId(@Param("equipmentId") Long equipmentId);
 
-    @Query("SELECT COUNT(o) FROM InspectionOrder o WHERE o.templateId = :templateId AND o.status = 'submitted'")
+    @Query("SELECT COUNT(o) FROM InspectionOrder o WHERE o.templateId = :templateId")
     long countByTemplateId(@Param("templateId") Long templateId);
 }

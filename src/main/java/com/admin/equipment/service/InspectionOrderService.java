@@ -207,9 +207,39 @@ public class InspectionOrderService {
         if (allPassed) {
             order.setStatus("closed");
             order.setClosedAt(LocalDateTime.now());
+
+            if (order.getParentOrderId() != null) {
+                closeAncestorChain(order.getParentOrderId());
+            }
         }
 
         return orderRepo.save(order);
+    }
+
+    private void closeAncestorChain(Long parentOrderId) {
+        InspectionOrder parent = orderRepo.findById(parentOrderId).orElse(null);
+        if (parent == null) {
+            return;
+        }
+        if (!"submitted".equals(parent.getStatus()) || !Boolean.FALSE.equals(parent.getIsPassed())) {
+            return;
+        }
+
+        List<InspectionOrder> reinspections = orderRepo.findByParentOrderIdOrderByIdDesc(parent.getId());
+        boolean anyReinspectionPassed = reinspections.stream()
+                .anyMatch(r -> "closed".equals(r.getStatus()) && Boolean.TRUE.equals(r.getIsPassed()));
+        if (!anyReinspectionPassed) {
+            return;
+        }
+
+        parent.setIsPassed(true);
+        parent.setStatus("closed");
+        parent.setClosedAt(LocalDateTime.now());
+        orderRepo.save(parent);
+
+        if (parent.getParentOrderId() != null) {
+            closeAncestorChain(parent.getParentOrderId());
+        }
     }
 
     private boolean hasValue(InspectionResultItem result) {

@@ -119,8 +119,7 @@ public class InspectionStatsService {
 
             withAbnormalCount++;
 
-            boolean isClosed = "closed".equals(order.getStatus())
-                    && Boolean.TRUE.equals(order.getIsPassed());
+            boolean isClosed = "closed".equals(order.getStatus());
             if (isClosed) {
                 closedCount++;
             }
